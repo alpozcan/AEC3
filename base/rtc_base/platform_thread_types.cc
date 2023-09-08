@@ -71,11 +71,12 @@ void SetCurrentThreadName(const char* name) {
 
 #pragma warning(push)
 #pragma warning(disable : 6320 6322)
-  __try {
-    ::RaiseException(0x406D1388, 0, sizeof(threadname_info) / sizeof(ULONG_PTR),
-                     reinterpret_cast<ULONG_PTR*>(&threadname_info));
-  } __except (EXCEPTION_EXECUTE_HANDLER) {  // NOLINT
-  }
+// TODO: couldn't get it to work
+//  __try {
+//    ::RaiseException(0x406D1388, 0, sizeof(threadname_info) / sizeof(ULONG_PTR),
+//                     reinterpret_cast<ULONG_PTR*>(&threadname_info));
+//  } __except (EXCEPTION_EXECUTE_HANDLER) {  // NOLINT
+//  }
 #pragma warning(pop)
 #elif defined(WEBRTC_LINUX) || defined(WEBRTC_ANDROID)
   prctl(PR_SET_NAME, reinterpret_cast<unsigned long>(name));  // NOLINT
