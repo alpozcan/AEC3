@@ -7,7 +7,6 @@
  *  in the file PATENTS.  All contributing project authors may
  *  be found in the AUTHORS file in the root of the source tree.
  */
-#ifdef __x86_64__
 
 #include <emmintrin.h>
 #include <xmmintrin.h>
@@ -438,5 +437,3 @@ void rftbsub_128_SSE2(float* a) {
 #endif
 
 }  // namespace webrtc
-
-#endif

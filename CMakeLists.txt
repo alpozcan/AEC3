@@ -6,19 +6,17 @@ set(CMAKE_CXX_STANDARD 20)
 
 project(${PROJECT} VERSION 0.1.0)
 
-add_compile_options(-g -fPIC -Wno-deprecated)
+add_compile_options(-Wall -fPIC -Wno-deprecated -m64 -fexceptions)
 
 if(APPLE)
-    add_definitions(-DWEBRTC_MAC -DWEBRTC_POSIX -DRTC_DISABLE_LOGGING)
+    add_definitions(-DWEBRTC_MAC -DWEBRTC_POSIX)
 elseif(UNIX AND NOT APPLE)
-    add_definitions(-DWEBRTC_LINUX -DWEBRTC_POSIX -DRTC_DISABLE_LOGGING)
+    add_definitions(-DWEBRTC_LINUX -DWEBRTC_POSIX)
 elseif(WIN32)
-    add_compile_options(-fexceptions)
-    add_definitions(-DWEBRTC_WIN -DRTC_DISABLE_LOGGING)
+    add_definitions(-DWEBRTC_WIN)
 endif()
 
 file(GLOB AECM_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/api/*.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/*.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/*.c
@@ -52,8 +50,8 @@ set(SRC_FILES ${AECM_SRC}
     ${CMAKE_CURRENT_SOURCE_DIR}/base/rtc_base/sanitizer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/utility/cascaded_biquad_filter.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/utility/ooura_fft.cc
-    #${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/utility/ooura_fft_mips.cc
-    #${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/utility/ooura_fft_neon.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/utility/ooura_fft_mips.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/utility/ooura_fft_neon.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/utility/ooura_fft_sse2.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/utility/cascaded_biquad_filter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/utility/ooura_fft.h
@@ -64,14 +62,6 @@ set(SRC_FILES ${AECM_SRC}
 add_library(${PROJECT} STATIC
     ${SRC_FILES}
 )
-
-if(WIN32)
-    target_link_libraries(
-        ${PROJECT}
-        -lwinmm
-        -limm32
-    )
-endif()
 
 target_include_directories(${PROJECT} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/
