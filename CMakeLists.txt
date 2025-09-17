@@ -6,6 +6,13 @@ set(CMAKE_CXX_STANDARD 17)
 
 project(${PROJECT} VERSION 0.1.0)
 
+# Determine Android ABI early so we can filter platform-specific sources
+if (CMAKE_SYSTEM_NAME STREQUAL "Android")
+    set(ANDROID_ABI ${CMAKE_ANDROID_ARCH_ABI})
+else()
+    set(ANDROID_ABI "")
+endif()
+
 add_compile_options(-Wall -fPIC -Wno-deprecated -fexceptions)
 
 # Avoid forcing -m64 when targeting Android/ARM; only add -m64 on non-Android hosts
@@ -49,6 +56,10 @@ file(GLOB AECM_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/base/jsoncpp/src/lib_json/*.h
 )
 list(FILTER AECM_SRC EXCLUDE REGEX ".*unittest.cc$")
+# Exclude x86 SSE-specific sources when building for non-x86 targets (e.g., arm64-v8a)
+if (NOT (ANDROID_ABI MATCHES "^(x86|x86_64)$" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^(i386|x86_64|x86)$"))
+    list(FILTER AECM_SRC EXCLUDE REGEX ".*sse.*")
+endif()
 set(SRC_FILES ${AECM_SRC}
     ${CMAKE_CURRENT_SOURCE_DIR}/base/rtc_base/checks.h
     ${CMAKE_CURRENT_SOURCE_DIR}/base/rtc_base/time_utils.h
