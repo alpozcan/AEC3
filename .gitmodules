@@ -1,0 +1,10 @@
+[submodule "third_party/pffft"]
+	path = third_party/pffft
+	url = https://github.com/marton78/pffft.git
+[submodule "third_party/jsoncpp"]
+	path = third_party/jsoncpp
+	url = https://github.com/open-source-parsers/jsoncpp.git
+[submodule "third_party/abseil-cpp"]
+	path = third_party/abseil-cpp
+	url = https://github.com/abseil/abseil-cpp.git
+	branch = lts_2025_08_14
