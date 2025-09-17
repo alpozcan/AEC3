@@ -6,7 +6,12 @@ set(CMAKE_CXX_STANDARD 17)
 
 project(${PROJECT} VERSION 0.1.0)
 
-add_compile_options(-Wall -fPIC -Wno-deprecated -m64 -fexceptions)
+add_compile_options(-Wall -fPIC -Wno-deprecated -fexceptions)
+
+# Avoid forcing -m64 when targeting Android/ARM; only add -m64 on non-Android hosts
+if (NOT CMAKE_SYSTEM_NAME STREQUAL "Android")
+    add_compile_options(-m64)
+endif()
 
 if(APPLE)
     add_definitions(-DWEBRTC_MAC -DWEBRTC_POSIX)
@@ -52,16 +57,32 @@ set(SRC_FILES ${AECM_SRC}
     ${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/utility/ooura_fft.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/utility/ooura_fft_mips.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/utility/ooura_fft_neon.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/utility/ooura_fft_sse2.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/utility/cascaded_biquad_filter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/utility/ooura_fft.h
     ${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/utility/ooura_fft_tables_common.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/utility/ooura_fft_tables_neon_sse2.h
 )
 
 add_library(${PROJECT} STATIC
     ${SRC_FILES}
 )
+
+# Architecture-specific additions: only compile SSE/x86 sources on x86 targets.
+# On Android, CMAKE_ANDROID_ARCH_ABI is set (e.g. arm64-v8a, armeabi-v7a, x86, x86_64).
+if (CMAKE_SYSTEM_NAME STREQUAL "Android")
+    set(ANDROID_ABI ${CMAKE_ANDROID_ARCH_ABI})
+else()
+    set(ANDROID_ABI "")
+endif()
+
+if (ANDROID_ABI MATCHES "^(x86|x86_64)$" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^(i386|x86_64|x86)$")
+    list(APPEND SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/audio_processing/utility/ooura_fft_sse2.cc)
+    # headers like ooura_fft_tables_neon_sse2.h are included by sources when needed
+endif()
+
+# If we appended any files, update the target sources.
+if (TARGET ${PROJECT})
+    target_sources(${PROJECT} PRIVATE ${SRC_FILES})
+endif()
 
 target_include_directories(${PROJECT} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/
