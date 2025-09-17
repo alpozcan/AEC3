@@ -1,3 +1,5 @@
+**/custom_lint.log
+
 build/**
 *.DS_Store
 */.DS_Store
