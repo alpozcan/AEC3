@@ -16,6 +16,7 @@ typedef struct {
     int sample_rate;      // Sample rate in Hz
     int num_channels;     // Number of channels
     int export_linear;    // Whether to export linear AEC output
+    int buffer_delay;     // Audio buffer delay in samples
 } aec3_config_t;
 
 // Create a new AEC3 instance
