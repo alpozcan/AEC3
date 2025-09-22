@@ -14,6 +14,7 @@
  */
 
 #include "rtc_base/checks.h"
+#include <stddef.h>
 #include <stdint.h>
 #include <stddef.h>  // For size_t.
 
